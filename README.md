@@ -4,4 +4,5 @@ Hi, my name is Alexander and I'm currently studying statistics at SFU. This is m
 
 ### SFU course outline webscraper 
 The goal of this project is to scrape and clean data from SFU's course outline webpages and display it in a table
-### [Report](http://rpubs.com/alexlo97/499378)  ###[Code](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
+### [Report](http://rpubs.com/alexlo97/499378)
+###[Code](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
