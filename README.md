@@ -11,3 +11,7 @@ In this project, I analyzed, scraped, cleaned, merged, and transform HTML tables
 The goal of this project is to scrape and clean text data from SFU's course outline webpages and display it in a table
 ### [Report](http://rpubs.com/alexlo97/499396)
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
+
+### Shiny app - Climate change in BC from 1979 - 2017
+I made this shiny app in STAT 240 at sfu. In this project, I designed the layout of my shiny app with buttons that plot different curves/lines on the plots.
+### [link](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/)
