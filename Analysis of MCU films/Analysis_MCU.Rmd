@@ -1,5 +1,5 @@
 ---
-title: "Analyzing Marvel Cinematic Universe films from 2008 - 2019"
+title: "Exploratory Data Analysis of Marvel Cinematic Universe films from 2008 - 2019"
 output: html_notebook
 ---
 
@@ -138,6 +138,7 @@ plot1 <- ggplot(merged, aes(x=Year, y=Metacritic)) +
   geom_point() +
   geom_smooth(method="loess") +
   scale_x_continuous(breaks=c(2008:2019)) +
+  theme(axis.text.x=element_text(angle = 60, hjust=1)) +
   ylim(50,100) +
   labs(title="Metacritic rating scores \n over time of MCU movies") +
   ylab(label="Metacritic Scores")
@@ -147,6 +148,7 @@ plot2 <- ggplot(merged, aes(x=Year, y=Rotten.Tomatoes)) +
   geom_smooth(method="loess") +
   scale_x_continuous(breaks=c(2008:2019)) +
   ylim(50,100) +
+  theme(axis.text.x=element_text(angle = 60, hjust=1)) +
   labs(title="Rotten Tomateos rating scores \n over time of MCU movies") +
   ylab(label="Rotten Tomatoes scores")
 
