@@ -13,5 +13,5 @@ The goal of this project is to scrape and clean text data from SFU's course outl
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
 
 ### Shiny app - Climate change in BC from 1979 - 2017
-I made this shiny app in STAT 240 at sfu. In this project, I designed the layout of my shiny app with buttons that plot different curves/lines on the plots.
+I made this shiny app in STAT 240 at sfu. In this project, I customized the layout of my shiny app with buttons that plots different curves/lines.
 ### [Link to app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/)
