@@ -17,6 +17,7 @@ library(tidyr)
 library(ggrepel)
 library(gridExtra)
 library(zoo)
+library(reshape2)
 ```
 
 
@@ -82,9 +83,9 @@ ggplot(data=merged, aes(x=Year)) +
   geom_point(data=merged,aes(y=Budget,colour="Budget_MovingAvg")) +
   geom_line(data=merged,aes(y=rollapplyr(merged$Budget,width=5,FUN=mean,partial=T),colour="Budget_MovingAvg")) +
   scale_x_continuous(breaks=c(2008:2019)) +
-  labs(title="Box Dffice Gross worldwide and Budget income over time for MCU movies") +
+  labs(title="Box Office Gross worldwide and Budget income over time for MCU movies") +
   ylab(label="Dollars") +
-  scale_colour_manual(name="", values=c(Gross_MovingAvg="#00BA38", Budget_MovingAvg="red", Gross_Loess="#619CFF"))
+  scale_colour_manual(name="", values=c(Gross_MovingAvg="#00BA38", Budget_MovingAvg="#F8766D", Gross_Loess="#619CFF")) 
 ```
 
 ### What is the distribution of revenue for Marvel movies? 
@@ -119,11 +120,11 @@ The graphs seems to suggest that they have a positive relationship and the movin
 ggplot(merged, aes(x=Revenue, y=Budget)) +
   geom_point() +
   geom_smooth(aes(colour="Loess"), method="loess",size=.6) +
-  geom_line(aes(x=Revenue,y=rollapplyr(merged$Budget,width=3,FUN=mean,partial=T),colour="Moving_Average"),size=.6 ) +
+  geom_line(aes(x=Revenue,y=rollapplyr(merged$Budget,width=3,FUN=mean,partial=T),colour="Moving Average"),size=.6 ) +
   ylab(label="Budget (Dollars)") +
   xlab(label="Revenue (Dollars)") +
   labs(title="Budget vs Revenue for MCU movies") +
-  scale_colour_manual(name="", values=c(Moving_Average="#619CFF", Loess="#00ba38"))
+  scale_colour_manual(name="", values=c("#619CFF","#00ba38"))
 ```
 
 ### Do Rotten Tomatoes and Metacritic agree? 
@@ -138,6 +139,25 @@ ggplot(merged, aes(x=Metacritic, Rotten.Tomatoes)) +
   labs(title="Metacritic ratings vs Rotten Tomatoes ratings of MCU Movies") +
   ylab(label="Rotten Tomatoes scores") +
   xlab(label="Metacritic scores")
+
+merged %>%
+  select(Film, Rotten.Tomatoes, Metacritic) %>%
+  melt() %>%
+  rename(Rating=variable) %>%
+  ggplot(aes(x=reorder(Film, value), y=value, fill=Rating)) +
+  geom_bar(stat="identity", position="dodge") +
+  coord_flip() +
+  scale_fill_discrete("")
+
+ggplot(merged) +
+  geom_bar(aes(x=reorder(Film, Rotten.Tomatoes), y=Rotten.Tomatoes, fill="Rotten Tomatoes"), stat="identity", alpha=1) +
+  geom_bar(aes(x=reorder(Film, Metacritic), y=Metacritic, fill="Metacritic"), stat="identity",alpha=1) +
+  coord_flip() +
+  scale_color_manual(values=c(a="red",b="blue")) +
+  scale_fill_discrete("") +
+  labs(title="Ratings of MCU movies") +
+  ylab("Rating") +
+  xlab("Movies")
 ```
 
 ### How have the ratings evolved over time?
@@ -163,5 +183,4 @@ plot2 <- ggplot(merged, aes(x=Year, y=Rotten.Tomatoes)) +
 
 grid.arrange(plot1, plot2, ncol=2)
 ```
-
 
