@@ -6,10 +6,10 @@ output: html_notebook
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-##### In this project, I scraped, cleaned, and transformed HTML tables of Marvel Cinematic Universe films from https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films. Afterwards, I analyzed the data and visualized my findings with ggplot2.
+##### In this project, I scraped, cleaned, and transformed data of Marvel Cinematic Universe films from https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films. Afterwards, I analyzed the data and visualized my findings with ggplot2. ***This information is valid up until April 2019.
 
 ##### Loading packages
-```{r}
+```{r message=FALSE}
 library(rvest)
 library(dplyr)
 library(ggplot2)
@@ -18,10 +18,12 @@ library(ggrepel)
 library(gridExtra)
 library(zoo)
 library(reshape2)
+library(car)
+library(plotly)
 ```
 
 
-##### Extracting and cleaning the Critical Response and Box Office Performance tables and merging them into a single data frame.
+##### Scraping two tables from Wikipedia: Critical Response table and Box Office Performance table. Afterwards, I cleaned and merged them into a single data frame.
 ```{r}
 movie_table <- read_html("https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films")
 boxoff <- html_table(html_nodes(movie_table, "table")[[10]],fill=T)[c(-1,-24),c(-3,-4,-6,-7,-9)] 
@@ -33,7 +35,7 @@ colnames(merged) <- make.names(colnames(merged))
 merged
 ```
 
-#### Now I will start by keeping the columns: Box office gross worldwide, release year, Budget, Rotten Tomatoes scores, and Metacritic scores. Also, I will create a new 'Revenue' column.
+#### The data in the table is not ready for analysis because there are symbols (commas, dollar signs, spaces) and useless words. Now I will start by cleaning the data by keeping the columns: Box office gross worldwide, release year, Budget, Rotten Tomatoes scores, and Metacritic scores. Also, I will create a 'Revenue' column in the table.
 
 ##### Removing the days and months while keeping the year and converting to numeric values
 ```{r}
@@ -67,7 +69,7 @@ merged$`Metacritic` <- substr(merged$`Metacritic`,1,2) %>% as.numeric()
 merged <- mutate(merged, Revenue=Box.Office.Gross.Worldwide-Budget)
 ```
 
-##### Cleaned and merged table
+#### Cleaned and merged table
 ```{r}
 write.csv(merged, "CleanedMarvel.csv")
 merged
@@ -89,19 +91,19 @@ ggplot(data=merged, aes(x=Year)) +
 ```
 
 ### What is the distribution of revenue for Marvel movies? 
-The red dashed line represents the mean revenue and the black surve represents the density curve. The distribution appears to be positively skewed to the right which means the mean (~$765 million) is greater than the median (~$620 million).
+The red dashed line represents the mean revenue and the black surve represents the density curve. Before taking the log of the revenue, the distribution appears to be positively skewed to the right. After the transformation, the distribution appears to be closer to a normal distribution.
 ```{r}
-ggplot(data=merged, aes(x=Revenue)) + 
-  geom_histogram(aes(y=..density..),bins=25, colour="dodgerblue4", fill="skyblue") +
+ggplot(data=merged, aes(x=log(Revenue))) + 
+  geom_histogram(aes(y=..density..), bins=25, colour="dodgerblue4", fill="skyblue") +
   geom_density(color="black") +
-  geom_vline(xintercept = mean(merged$Revenue), color = "red", linetype = "dashed") +
-  labs(title="Distribution of Revenue for MCU movies") +
-  xlab(label="Revenue (Dollars)") +
+  geom_vline(xintercept = mean(log(merged$Revenue)), color = "red", linetype = "dashed") +
+  labs(title="Distribution of log10(Revenue) for MCU movies") +
+  xlab(label="log10(Revenue) in Dollars") +
   ylab(label="Density")
 ```
 
-### Split-apply-combine analysis to find the year with the higest revenue
-The graphs shows that 2018 and 2019 MCU movies brought in the highest Revenue income.
+### Which years did MCU movies bring in the most revenue? 
+The graphs show that 2018 and 2019 MCU movies brought in the highest Revenue income. However there were 2 MCU released in 2019 and 3 in 2018. A film released in 2019 generated significantly more revenue than movies from previous years. (Avengers: Endgame)
 ```{r}
 merged %>%
   group_by(Year) %>%
@@ -112,6 +114,11 @@ merged %>%
   scale_x_continuous(breaks=c(2008:2019)) +
   labs(title="Total Revenue vs Year of MCU movies") +
   ylab(label="Total Revenue")
+
+ggplot(merged, aes(x=Film, y=Revenue)) + 
+  geom_bar(stat="identity") + facet_wrap(~Year) + 
+  theme(axis.text.x=element_blank(), axis.ticks.x=element_blank()) +
+  labs(title="Revenue of MCU movies from 2008-2019")
 ```
 
 ### Relationship of Budget and Gross Revenue
@@ -131,7 +138,7 @@ ggplot(merged, aes(x=Revenue, y=Budget)) +
 They seem to have a positive relatiionship, however it is not proportional. Metacritic appears to give lower ratings than Rotten Tomatoes.
 ```{r}
 ggplot(merged, aes(x=Metacritic, Rotten.Tomatoes)) +
-  geom_point(size=.5) +
+  geom_point( size=.5) +
   geom_text_repel(label=merged$Film, size=3) +
   xlim(50,100) +
   ylim(50,100) +
@@ -139,15 +146,6 @@ ggplot(merged, aes(x=Metacritic, Rotten.Tomatoes)) +
   labs(title="Metacritic ratings vs Rotten Tomatoes ratings of MCU Movies") +
   ylab(label="Rotten Tomatoes scores") +
   xlab(label="Metacritic scores")
-
-merged %>%
-  select(Film, Rotten.Tomatoes, Metacritic) %>%
-  melt() %>%
-  rename(Rating=variable) %>%
-  ggplot(aes(x=reorder(Film, value), y=value, fill=Rating)) +
-  geom_bar(stat="identity", position="dodge") +
-  coord_flip() +
-  scale_fill_discrete("")
 
 ggplot(merged) +
   geom_bar(aes(x=reorder(Film, Rotten.Tomatoes), y=Rotten.Tomatoes, fill="Rotten Tomatoes"), stat="identity", alpha=1) +
@@ -158,6 +156,7 @@ ggplot(merged) +
   labs(title="Ratings of MCU movies") +
   ylab("Rating") +
   xlab("Movies")
+
 ```
 
 ### How have the ratings evolved over time?
@@ -178,9 +177,15 @@ plot2 <- ggplot(merged, aes(x=Year, y=Rotten.Tomatoes)) +
   scale_x_continuous(breaks=c(2008:2019)) +
   ylim(50,100) +
   theme(axis.text.x=element_text(angle = 60, hjust=1)) +
-  labs(title="Rotten Tomateos rating scores \n over time of MCU movies") +
+  labs(title="Rotten Tomatoes rating scores \n over time of MCU movies") +
   ylab(label="Rotten Tomatoes scores")
 
-grid.arrange(plot1, plot2, ncol=2)
+grid.arrange(plot2, plot1, ncol=2)
 ```
+
+### Conlusion
+1. Budget appears to be somewhat constant while Gross is on an upward trend
+2. Rotten tomatoes tends to give higher ratings than Metacritic
+3. The highest by Rotten Tomatoes and Metacritic is Black Panther
+4. The movie that brought in the most revenue was Avengers:Endgame in 2019
 
