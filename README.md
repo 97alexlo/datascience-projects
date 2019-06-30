@@ -8,7 +8,7 @@ In this project, I analyzed, scraped, cleaned, and merged, data tables from Wiki
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
 ### (March 2019) SFU course outline webscraper 
-The goal of this project is to scrape and clean text data from SFU's course outline webpages and display it in a table
+The goal of this project is to scrape and clean text data (ex. Professor's name, exam locations, course ID, textbooks) from SFU's course outline webpages and display them in a table.
 ### [Report](http://rpubs.com/alexlo97/499396)
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
 
