@@ -12,6 +12,6 @@ The goal of this project is to scrape and clean text data (ex. Professor's name,
 ### [Report](http://rpubs.com/alexlo97/499396)
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
 
-### Shiny app - Climate change in BC from 1979 - 2017
+### Web app (Shiny) - Climate change in BC from 1979 - 2017
 This is a shiny app I made in STAT 240 at SFU. In this project, I customized the layout of my shiny app with buttons that plots different curves/lines.
 ### [Link to app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/)
