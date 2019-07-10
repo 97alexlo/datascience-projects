@@ -1,7 +1,8 @@
 # Data Science Portfolio by Alexander Lo
 
 Hi, my name is Alexander and I'm currently studying statistics at SFU. This is my profolio where I will be uploading my projects. I am constantly trying to improve my data analysis skills and hoping to create better projects in the future. Thanks for reading
-
+## R
+## ___________________________________________________________________________________________________________________________
 ### Exploratory Data Analysis of Marvel Universe Cinematic films from 2008 - 2019
 In this project, I analyzed, scraped, cleaned, and merged, data tables from Wikipedia of MCU films. I decided to do this project because I'm a fan of their movies and was curious their worldwide popularity.
 ### [Report](https://rpubs.com/alexlo97/499619)
