@@ -16,4 +16,4 @@ In this project, I scraped and cleaned text (ex. Professor's name, exam location
 ### Web app (Shiny) - Climate change in BC from 1979 - 2017
 This is a shiny app I made in STAT 240 at SFU where I customized the layout with buttons that plots different curves/slopes with the data sets provided by Dr.Campbell
 ### [Link to app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/)
-### [Link to R files]
+### [R files](https://github.com/alexlo97/Portfolio/tree/master/Shiny%20App)
