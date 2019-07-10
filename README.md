@@ -4,7 +4,7 @@ Hi, my name is Alexander and I'm currently studying statistics at SFU. This is m
 
 ## R
 ### Exploratory Data Analysis of Marvel Universe Cinematic films from 2008 - 2019
-In this project, I analyzed data scraped from from Wikipedia's webpage of MCU films
+In this project, I analyzed scraped and analyzed data from Wikipedia's webpage of MCU films
 ### [Report](https://rpubs.com/alexlo97/499619)
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
