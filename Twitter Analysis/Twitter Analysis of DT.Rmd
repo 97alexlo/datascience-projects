@@ -1,0 +1,182 @@
+---
+title: "Twitter (and Sentiment) Analysis of Donald Trump's Tweets using an API"
+Author: "Alexander Lo"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##### In this project, I cleaned and analyzed data collected from Donald Trump's Twitter account using an API.
+
+##### Loading libraries
+```{r}
+library(dplyr)
+library(twitteR)
+library(ROAuth)
+library(ggplot2)
+library(RColorBrewer)
+library(wordcloud)
+```
+
+##### Retrieving 3200 most recent tweets by Donald Trump
+```{r}
+consumer_key = "s8OWnvqLPckxI0JBcrnZR6rLM"
+consumer_secret = "Zve0oxqK7PuU3MIwN0Snz2wvLWmK100hZ2hxczKGMmqxAo0oZe"
+access_token = "111199907-Jpm02lPlAPXk3tenVitYPH2TObjVcZSz3AOu7qGs"
+access_secret ="616o99du0NZt3bGrHYQBJ8SWOb3V7QTAZdEVDYk6ajQRl"
+requestURL = "https://api.twitter.com/oauth/request_token"
+accessURL ="https://api.twitter.com/oauth/access_token"
+authURL ="https://api.twitter.com/oauth/authorize"
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+tw=userTimeline("realDonaldTrump", n=3000, includeRts=TRUE)
+df=twListToDF(tw)
+```
+
+##### What is his most commonly used platform to tweet? 
+Tweets from his account are mostly from an iPhone
+```{r}
+df$statusSource = substr(df$statusSource, regexpr(">", df$statusSource) + 1, regexpr("</a>", df$statusSource) -  1)
+ggplot(df, aes(x=statusSource), fill()) +
+  geom_bar() +
+  labs(title="Twitter platforms by @realDonaldTrump") +
+  ylab(label="Number of tweets") +
+  xlab(label="Type of platform")
+```
+
+##### What time of the day does he usually tweet? 
+He is most likely to tweet during the afternoon (11am-3pm) and less during Tuesdays and Thursdays.
+```{r}
+df$timeonly = as.numeric(difftime(df$created, trunc(df$created, "days"), attr(df$created, "tzone"), "hours"))
+ggplot(df, aes(x=timeonly)) +
+  geom_histogram(aes(y=..density..), bins=35, colour="#F8766D", fill="#F8766D") +
+  geom_density() +
+  labs(title="Tweets by time of day by @realDonaldTrump") +
+  xlab(label="Hour of day") 
+
+ggplot(as.data.frame(table(weekdays(df[,"created"]))[c("Monday", "Tuesday","Wednesday", "Thursday", "Friday","Saturday", "Sunday")])) +
+  geom_bar(aes(x=Var1, y=Freq), stat="identity") +
+  labs(title="Tweet frequency by day by @realDonaldTrump") +
+  xlab(label="Days of the week") +
+  ylab(label="Frequency")
+```
+
+##### What are the most frequently used words in his tweets?
+After removing characters that are not letters, additional spaces between words, changing all words to lower-case etc.., the wordcloud shows that the two most frequent words in his tweets are "great" and "president"
+```{r}
+Words2Use = unlist(strsplit(df$text," "))
+sentence1 = tolower(Words2Use)
+sentence1_5 = gsub("amp", " ", sentence1)
+sentence1_6 = gsub("rt", " ", sentence1_5)
+sentence2 = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", " ", sentence1_6)
+sentence3 = gsub("@\\w+", " ", sentence2)
+sentence4 = gsub("(?!')[[:punct:]]", "", sentence3,perl=T)
+sentence5 = gsub("[[:cntrl:]]", "", sentence4)
+sentence6 = gsub("[[:digit:]]", "", sentence5)
+sentence7 = iconv(sentence5, "ASCII", "UTF-8", sub = "") 
+sentence9 = gsub("http\\w+", "", sentence7)
+sentence10 = gsub("[ \t]{2,}", " ", sentence9)
+sentence11 = gsub("^\\s+|\\s+$", "", sentence10) 
+word.list = strsplit(sentence11, " ")
+words = unlist(word.list)
+NotStopWords = words[!words %in% tm::stopwords(kind = "english")]
+tbl = table(NotStopWords)
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, "Commonly used words from tweets by @realDonaldTrump" )
+wordcloud(names(sort(tbl,decreasing=TRUE)[1:40]),sort(tbl,decreasing=TRUE)[1:50],
+          colors = rainbow(9), min.freq = 100)
+
+tbldf=as.data.frame(sort(tbl,decreasing=TRUE)[1:25])
+tbldf %>%
+  filter(Freq>10) -> tbldf2
+ggplot(tbldf2, aes(x=reorder(NotStopWords, Freq), y=Freq)) +
+  geom_bar(stat="identity") +
+  coord_flip() + 
+  ylab(label="Occurences") +
+  xlab(label="Word") +
+  labs(title="Frequently used words in tweets by @realDonaldTrump")
+```
+
+##### Sentiment Analysis
+The first graph shows a sentiment analysis of his tweets during a period of time. The second graph shows that the sentiment scores for his tweets follow a normal distribution, with an average score of 0.2304609 which is close to neutral. The list of positive and negative words were obtained from https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html. 
+```{r}
+pos = scan("positive-words.txt", what = "character",comment.char = ";")
+neg = scan("negative-words.txt", what = "character",comment.char = ";")
+getSentimentScore = function(tweet_text, pos, neg) {
+
+  sentence = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", "", tweet_text)
+
+  sentence = gsub("@\\w+", "", sentence)
+
+  sentence = gsub("[[:punct:]]", "", sentence)
+
+  sentence = gsub("[[:cntrl:]]", "", sentence)
+
+  sentence = gsub("[[:digit:]]", "", sentence) 
+
+  sentence = gsub("http\\w+", "", sentence)
+
+  sentence = gsub("^\\s+|\\s+$", "", sentence)
+
+  sentence = iconv(sentence, "UTF-8", "ASCII", sub = "")
+  sentence = tolower(sentence)
+
+  word.list = strsplit(sentence, " ")
+
+  score = numeric(length(word.list)) # loop through each tweet
+  positive = numeric(length(word.list))
+  negative = numeric(length(word.list))
+  for (i in 1:length(word.list)) {
+
+    pos.matches = match(word.list[[i]], pos) 
+    neg.matches = match(word.list[[i]], neg)
+
+    pos.matches = !is.na(pos.matches)
+    neg.matches = !is.na(neg.matches)
+
+    score[i] = sum(pos.matches) - sum(neg.matches)
+    positive[i] = sum(pos.matches)
+    negative[i] = sum(neg.matches)
+  }
+  return(data.frame(positive_score = positive, 
+                    negative_score = negative,
+                    sentiment_score = score))
+}
+output = getSentimentScore(df$text, pos, neg)
+df$sentiment = output[, "sentiment_score"]
+df$pos_sentiment = output[, "positive_score"]
+df$neg_sentiment = output[, "negative_score"]
+df$day = as.Date(cut(df$created, breaks = "day"))
+df %>% 
+  group_by(day) %>%
+  summarise(meanPos = mean(pos_sentiment), meanNeg = mean(neg_sentiment), meanSent = mean(sentiment)) -> sentiment_byday
+
+ggplot(sentiment_byday,aes(x=day)) +
+  geom_line(aes(y=meanNeg,colour="Positive words")) +
+  geom_line(aes(y=meanPos, colour="Negative words")) +
+  scale_colour_manual(values=c(`Positive words`="#619CFF", `Negative words`="#F8766D")) +
+  theme(legend.justification = c(1, 1), legend.position = c(.95, .95), legend.title=element_blank()) +
+  xlab(label="Date") +
+  ylab(label="Sentiment Score")
+
+ggplot(output, aes(x=sentiment_score)) +
+  geom_density(bw=.5)  +
+  labs(title="Distribution of sentiment scores of tweets by @realDonaldTrump") +
+  geom_vline(xintercept = mean(output$sentiment_score), color = "red", linetype = "dashed") +
+  xlab(label="Sentiment Score") +
+  ylab(label="Density")
+```
+
+##### References
+;   Minqing Hu and Bing Liu. "Mining and Summarizing Customer Reviews." 
+;       Proceedings of the ACM SIGKDD International Conference on Knowledge 
+;       Discovery and Data Mining (KDD-2004), Aug 22-25, 2004, Seattle, 
+;       Washington, USA, 
+;   Bing Liu, Minqing Hu and Junsheng Cheng. "Opinion Observer: Analyzing 
+;       and Comparing Opinions on the Web." Proceedings of the 14th 
+;       International World Wide Web conference (WWW-2005), May 10-14, 
+;       2005, Chiba, Japan.
