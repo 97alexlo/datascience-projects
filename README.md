@@ -1,6 +1,6 @@
 # Data Science Portfolio by Alexander Lo
 
-Hi, my name is Alexander and I am currently studying statistics at SFU. This is where I will be uploading my projects. Thank you for visiting!
+Hi, my name is Alexander and I am currently studying statistics at SFU. This is where I will be uploading my personal projects. Thank you for visiting!
 
 ## R
 ### Exploratory Data Analysis of Marvel Universe Cinematic films from 2008 - 2019
@@ -19,6 +19,6 @@ In this project, I created a webscraper that collects relevant information (ex. 
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
 
 ### Web App (Shiny) - Climate change in BC from 1979 - 2017
-This is a shiny app I made in STAT 240 at SFU where I customized the layout, along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
+This is a shiny app that I made where I customized the layout, along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
 ### [Link to app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/)
 ### [R files](https://github.com/alexlo97/Portfolio/tree/master/Shiny%20App)
