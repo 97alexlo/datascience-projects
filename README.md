@@ -11,7 +11,7 @@ In this project, I scraped and analyzed data from Wikipedia's webpage of MCU fil
 ### Twitter (and Sentiment) Analysis of Donald Trump’s Tweets using an API
 In this project, I analyzed data collected using twitter's API from Donald Trump's tweets. 
 ### [Report](http://rpubs.com/alexlo97/512292)
-### [Rmd file]
+### [Rmd file](https://github.com/alexlo97/Portfolio/blob/master/Twitter%20Analysis/Twitter%20Analysis%20of%20DT.Rmd)
 
 ### SFU Course Outline Webscraper 
 In this project, I scraped and cleaned text (ex. Professor's name, exam locations, course ID, textbooks) from SFU's course outline webpages and displayed them in a table
