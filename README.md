@@ -14,7 +14,7 @@ In this project, I analyzed data collected using twitter's API from Donald Trump
 ### [Rmd file](https://github.com/alexlo97/Portfolio/blob/master/Twitter%20Analysis/Twitter%20Analysis%20of%20DT.Rmd)
 
 ### SFU Course Outline Webscraper 
-In this project, I scraped and cleaned text (ex. Professor's name, exam locations, course ID, textbooks) from SFU's course outline webpages and displayed them in a table
+In this project, I created a webscraper that collects relevant information (ex. Professor's name, exam locations, course ID, textbooks) from SFU's course outline webpages and displayed them in a table
 ### [Report](http://rpubs.com/alexlo97/499396)
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
 
