@@ -1,6 +1,6 @@
 # Data Science Portfolio by Alexander Lo
 
-Hi, my name is Alexander and I am currently studying statistics at SFU. This is where I will be uploading my personal projects. Thank you for visiting!
+Hi, my name is Alexander and I am currently studying statistics at SFU. This is where I will be uploading my personal projects. Thank you for visiting
 
 ## R
 ### Exploratory Data Analysis of Marvel Universe Cinematic films from 2008 - 2019
