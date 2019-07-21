@@ -3,12 +3,12 @@
 Hi, my name is Alexander and I am currently studying statistics at SFU. This is where I will be uploading my personal projects. Thank you for visiting
 
 ## R
-### Exploratory Data Analysis of Marvel Universe Cinematic films from 2008 - 2019
+### Analysis of Marvel Universe Cinematic films from 2008 - 2019
 In this project, I scraped and analyzed data from Wikipedia's webpage of MCU films
 ### [Report](https://rpubs.com/alexlo97/499619)
 ### [Rmd file](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
-### Twitter (and Sentiment) Analysis of Donald Trump’s Tweets using an API
+### Twitter (and Sentiment) Analysis of Donald Trump’s tweets using an API
 In this project, I analyzed data collected using twitter's API from Donald Trump's tweets. 
 ### [Report](http://rpubs.com/alexlo97/512292)
 ### [Rmd file](https://github.com/alexlo97/Portfolio/blob/master/Twitter%20Analysis/Twitter%20Analysis%20of%20DT.Rmd)
