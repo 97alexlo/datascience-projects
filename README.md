@@ -1,4 +1,4 @@
-# Data Science Portfolio by Alexander Lo
+# Data Science Portfolio
 
 Hi, my name is Alexander and I am currently studying statistics at SFU. This is where I will be uploading my personal projects
 
