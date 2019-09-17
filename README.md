@@ -18,7 +18,7 @@ In this project, I created a webscraper that collects relevant information (ex. 
 ### [Report](http://rpubs.com/alexlo97/499396)
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
 
-### Web App (Shiny) - Climate change in BC from 1979 - 2017
-This is a shiny app that I made where I customized the layout, along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
+### My first Shiny app - Climate change in BC from 1979 - 2017
+This is a shiny app that I made where I customized the layout, along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell in STAT 240
 ### [Link to app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/)
 ### [R files / Code](https://github.com/alexlo97/Portfolio/tree/master/Shiny%20App)
