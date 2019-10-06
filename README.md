@@ -16,12 +16,12 @@ In this project, I collaborated with two classmates to clean and analyze a [data
 
 
 ### Analysis of Marvel Universe Cinematic films from 2008 - 2019
-In this project, I scraped and analyzed data from [Wikipedia's webpage](https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films) of MCU films. I created a variety visualizations and to find trends in the data
+In this project, I scraped and analyzed data from [Wikipedia's webpage of MCU films](https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films. I created a variety visualizations and to find trends in the data.
 ### [Report](https://rpubs.com/alexlo97/499619)
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
 ### Twitter (and Sentiment) Analysis of Donald Trump’s tweets 
-In this project, I collected data from Donald Trump's twitter using an API. Using the data, I performed text preprocessing and exploratory analysis
+In this project, I collected data from Donald Trump's twitter using an API. Using the data, I performed text preprocessing and exploratory analysis to draw insights on his tweeting behaviour
 ### [Report](http://rpubs.com/alexlo97/512292)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Twitter%20Analysis/Twitter%20Analysis%20of%20DT.Rmd)
 
@@ -31,6 +31,6 @@ This is a project from STAT 240 where I created webscraper that collects relevan
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/SFU_webscraper.Rmd)
 
 ### My first Shiny app - Climate change in BC from 1979 - 2017
-This is a shiny app where I customized the layout, along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
+This is the first shiny app I created. I customized the layout along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
 ### [Link to app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/)
 ### [R files and Code](https://github.com/alexlo97/Portfolio/tree/master/Shiny%20App)
