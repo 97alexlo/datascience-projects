@@ -4,7 +4,7 @@ Hi, my name is Alexander and I am currently a 4th year student studying statisti
 
 ## R
 ### Predicting housing prices in King Country
-In this project, I collaborated with two classmates to clean and analyze a data set from Kaggle to predict house prices. We created a multiple linear regression model and implemented LASSO, Ridge, Stepwise, Forwards, and Backwards feature selection techniques. Our findings were summarised and presented in an executive report and powerPoint presentation to a class of 70 students. 
+In this project, I collaborated with two classmates to clean and analyze a [dataset](https://www.kaggle.com/harlfoxem/housesalesprediction) from Kaggle to predict house prices. We created a multiple linear regression model and implemented LASSO, Ridge, Stepwise, Forwards, and Backwards feature selection techniques. Our findings were summarised and presented in an executive report and powerPoint presentation to a class of 70 students. 
 ### [Report](https://rpubs.com/alexlo97/499619)
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
