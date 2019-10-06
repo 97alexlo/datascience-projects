@@ -1,0 +1,480 @@
+---
+title: 'National Case Study Competition: BC Ferries delay prediction'
+subtitle: 'hosted by CANSSI (Canadian Statistical Sciences Institute)'
+author: "Alexander Lo"
+date: "26/09/2019"
+output:
+  html_document: default
+  html_notebook: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+The goal of this challenge is to predict the probability of delays of BC ferries that sail back and forth between Vancouver and Victoria. We are provided with 5 data sets: 1 traffic data set, 1 train set, 1 test set, 1 Vancouver weather data set, and 1 Victoria Weather data set. This report summarizes the methods I used and the results I received on my first Kaggle competition.
+\
+\
+Load libraries and drop columns that I won't be using
+```{r}
+suppressMessages(library(tidyverse))
+suppressMessages(library(caret))
+suppressMessages(library(glmnet))
+suppressMessages(library(plyr))
+suppressMessages(library(xgboost))
+suppressMessages(library(reshape2))
+setwd("/Users/alex/canssi-ncsc-ferry-delays")
+traffic <- read.csv("traffic.csv")
+vancouver <- read.csv("vancouver.csv")
+victoria <- read.csv("victoria.csv")
+#remove columns from the train set that aren't in the test set
+train1 <- read.csv("train.csv") %>% 
+  dplyr::select( -c(Status, Trip.Duration))
+test1 <- read.csv("test.csv") %>% 
+  dplyr::select(-ID) #remove "ID" column from test set because it is not useful
+```
+\
+Gather information about the data sets
+```{r}
+#save delay indicators from train set into a variable
+DelayIndTrain <- as.factor(train1$Delay.Indicator)
+
+#remove delay.indicator because it saved in a variable
+train1 <- train1 %>%
+  dplyr::select(-Delay.Indicator)
+
+#check if train and test sets have the same number of columns
+head(train1, 4)
+head(test1, 4)
+
+#check details of data sets
+str(train1)
+str(test1)
+```
+\
+### Transforming features in the data for future analysis and modelling
+There is a "Scheduled.Departure" column for both train and test set. They are in the form 00:00 AM/PM so I decided that I will convert them to numbers. I will start with the test set:
+```{r}
+test1$Scheduled.Departure<- as.character(test1$Scheduled.Departure)
+
+#Remove all "AM"s and "PM"s from the column and split the time in hours and minutes by diving the numbers by 60
+AM <- as.character(gsub(" AM", "",test1[which(str_detect(test1$Scheduled.Departure, "AM")), "Scheduled.Departure"]))
+AM <- sapply(strsplit(AM,":"),
+  function(x) {
+    x <- as.numeric(x)
+    x[1]+x[2]/60
+    }
+)
+test1 <- test1 %>% 
+  mutate(Scheduled.Departure = replace(test1$Scheduled.Departure, str_detect(test1$Scheduled.Departure, "AM"), AM))
+
+twelve <- as.character(gsub(" PM", "",test1[which(str_detect(test1$Scheduled.Departure, "12")), "Scheduled.Departure"]))
+twelve <- sapply(strsplit(twelve,":"),
+  function(x) {
+    x <- as.numeric(x)
+    x[1]+x[2]/60
+    }
+)
+test1 <- test1 %>% 
+  mutate(Scheduled.Departure = replace(test1$Scheduled.Departure, str_detect(test1$Scheduled.Departure, "12"), twelve))
+
+PM <- as.character(gsub(" PM", "",test1[which(str_detect(test1$Scheduled.Departure, "PM")), "Scheduled.Departure"]))
+PM <- sapply(strsplit(PM,":"),
+  function(x) {
+    x <- as.numeric(x)
+    (x[1]+x[2]/60)+12
+    }
+)
+test1 <- test1 %>% 
+  mutate(Scheduled.Departure = replace(test1$Scheduled.Departure, str_detect(test1$Scheduled.Departure, "PM"), PM))
+test1$Scheduled.Departure <- as.numeric(test1$Scheduled.Departure)
+```
+\
+Now that the test set is finished, I will do the same in the train set
+```{r}
+train1$Scheduled.Departure<- as.character(train1$Scheduled.Departure)
+
+#Remove all "AM"s and "PM"s from the column and split the time in hours and minutes by diving the numbers by 60
+AM <- as.character(gsub(" AM", "",train1[which(str_detect(train1$Scheduled.Departure, "AM")), "Scheduled.Departure"]))
+AM <- sapply(strsplit(AM,":"),
+  function(x) {
+    x <- as.numeric(x)
+    x[1]+x[2]/60
+    }
+)
+train1 <- train1 %>% 
+  mutate(Scheduled.Departure = replace(train1$Scheduled.Departure, str_detect(train1$Scheduled.Departure, "AM"), AM))
+
+twelve <- as.character(gsub(" PM", "",train1[which(str_detect(train1$Scheduled.Departure, "12")), "Scheduled.Departure"]))
+twelve <- sapply(strsplit(twelve,":"),
+  function(x) {
+    x <- as.numeric(x)
+    x[1]+x[2]/60
+    }
+)
+train1 <- train1 %>% 
+  mutate(Scheduled.Departure = replace(train1$Scheduled.Departure, str_detect(train1$Scheduled.Departure, "12"), twelve))
+
+PM <- as.character(gsub(" PM", "",train1[which(str_detect(train1$Scheduled.Departure, "PM")), "Scheduled.Departure"]))
+PM <- sapply(strsplit(PM,":"),
+  function(x) {
+    x <- as.numeric(x)
+    (x[1]+x[2]/60)+12
+    }
+)
+train1 <- train1 %>% 
+  mutate(Scheduled.Departure = replace(train1$Scheduled.Departure, str_detect(train1$Scheduled.Departure, "PM"), PM))
+train1$Scheduled.Departure <- as.numeric(train1$Scheduled.Departure)
+```
+\
+Now let's take a look at the data. "Scheduled.Departure" has been converted from time to numbers from 0 to 23. 0 represents 12 AM and 23 represents 11 PM
+```{r}
+head(train1, 4)
+head(test1, 4)
+```
+\
+Since I was provided with traffic and weather data sets, I wondered if there is a way to incorporate them into the model that I will build later. I decided to look up the BCFerries website (https://www.bcferries.com/current_conditions/Stats.html) and discovered that traffic accounts for 58% all ferry delays, while weather accounts for only 3%. I knew that incorporating traffic data in the model would be significant. I decided to merged the traffic data with the train and test sets. All of these sets had year, month, day, and hour/minutes, so I decided to merge them by these columns that they had in common. I cleaned the traffic data set took the average traffic score for each hour. 
+```{r}
+#transform ing the traffic data set into average traffic per year, month, day, and time of day 
+traffic <- na.omit(traffic) %>% 
+  group_by(Year, Month, Day, Hour, Minute) %>%
+  ungroup() %>%
+  mutate(Hour = round(Hour + Minute/60, 1)) %>%
+  dplyr::select(-Minute) %>%
+  group_by(Year, Month, Day, Hour) %>%
+  dplyr::summarise(AvgTraffic = mean(Traffic.Ordinal)) 
+  
+#convert the months from the traffic data set from numbers to words
+colnames(traffic)[3] <- "Day.of.Month"
+my.month.name <- Vectorize(function(n) c("January", "February", "March", 
+                                         "April", "May", "June", "July", 
+                                         "August", "September", "October",
+                                         "November", "December")[n])
+traffic$Month <- my.month.name(traffic$Month)
+
+#rounding the hours to one decimal place to join with the traffic data set
+train1 <- train1 %>% mutate(Hour = round(Scheduled.Departure, 1))
+test1 <- test1 %>% mutate(Hour = round(Scheduled.Departure, 1))
+```
+\
+One problem was that the hours were very exact in all three data sets. For example, a number like 12.34567 is not common in all data sets, and merging them together would create many missing values. To fix his problem, I decided to round the hours to one decimal place since these numbers aren't as exact. Afterwards, there were 96 rows of missing average traffic values, so I create a histogram of the traffic values to check for its distribution. It shows that the traffic is heavily focused on the median value "1", so I replaced the remaining missing values with the median. Where 1 is low traffic and 5 is high traffic of sailings
+```{r}
+ggplot(traffic, aes(x=AvgTraffic)) +
+  geom_histogram(bins=40) +
+  ggtitle("Distribution of average traffic scores") +
+  xlab("Average traffic rating")
+
+#joining traffic data set to train and test sets and replacing missing average traffic values with the median (1)
+train1<- join(train1, traffic, by=c("Month","Day.of.Month", "Year", "Hour")) %>% dplyr::select(-Hour) %>% mutate(Month = as.factor(Month), AvgTraffic = replace(AvgTraffic, is.na(AvgTraffic), median(AvgTraffic, na.rm = T)))
+
+test1 <- join(test1, traffic, by=c("Month","Day.of.Month", "Year", "Hour")) %>% dplyr::select(-Hour) %>% mutate(Month = as.factor(Month), AvgTraffic = replace(AvgTraffic, is.na(AvgTraffic), median(AvgTraffic, na.rm = T)))
+```
+\
+Now let's take a look at the data. There is a new "average traffic" column for the train and test set. I will combine them into one big data set so I can scale the values for modelling later. Since hour is a cyclical feature, meaning that 0 and 23 and closer to each other than 0 and 6, I converted them by 2(pi)(cos)(Scheduled.Departure)/24. I would do the same with sin, however later on I found that it decreases the accuracy of the model
+```{r}
+#combining train and test sets 
+all <- rbind(train1,test1)
+
+#remove Year and Full.Date (Year is not a useful feature, as seen later on after building the model)
+all$Year <- NULL
+all$Full.Date <- NULL
+
+#make hour.y feature 
+all <- all %>% 
+  mutate(hour.y = cos(2*pi*all$Scheduled.Departure/24))
+         #,hour.y = cos(2*pi*all$Scheduled.Departure/24)) 
+```
+\
+In this chunk of code, I tried creating different features such as splitting the years into quarters, making a feature that indicates if the Scheduled.Departure is during AM or PM, and splitting the "Trip" feature into Departure and Destination. However, later on I found out that they decreased the model's accuracy
+```{r}
+#weekend feature and splitting year into quarters feature but didn't give a better score
+#all$Weekend <- ifelse(all$Day %in% c("Sunday", "Saturday"), 1, 0)
+#all$first_quarter <- ifelse(all$Month %in% c("January", "February", "March"), 1, 0)
+#all$second_quarter <- ifelse(all$Month %in% c("April", "May", "June"), 1, 0)
+#all$third_quarter <- ifelse(all$Month %in% c("July", "August", "September"), 1, 0)
+#all$fourth_quarter <- ifelse(all$Month %in% c("October", "November", "December"), 1, 0)
+
+#am or pm features below but it didn't give a better score
+#all <- all %>% 
+ # mutate(AMcode = NA, PMcode = NA)
+#all[which(str_detect(train1$Scheduled.Departure, "AM")), "AMcode"] <- 1
+#all[which(str_detect(train1$Scheduled.Departure, "PM")), "PMcode"] <- 1
+#all[is.na(train1)] <- 0
+
+#tried making departure and destinatoin but didn't give a better score  
+#Departure=unlist(lapply(str_split(all$Trip, " to "), `[[`,1))
+#Destination= unlist(lapply(str_split(all$Trip, " to "), `[[`,2))
+```
+\
+Since there are categorical variables in the data set, I dealt with them using one-hot encoding. Afterwards I scaled the data so that the values are in the same range and split them into train and test sets for modelling
+```{r}
+#dummy <- dummyVars(~Vessel.Name + Month + Day + Departure + Destination, all)
+dummy <- dummyVars(~Vessel.Name+ Month +Day + Trip, all)
+all_dummies <- data.frame(predict(dummy, newdata=all))
+#all_hour_daymonth_year <- all %>% select(-c(Vessel.Name, Month, Day, Departure, Destination))
+all_hour_daymonth_year <- all %>% dplyr::select(-c(Vessel.Name, Month, Day, Trip))
+all_encoded <- cbind(all_hour_daymonth_year, all_dummies)
+
+#scaling test + train data
+all_encoded_scaled <- as.data.frame(scale(all_encoded))
+
+train_final <-all_encoded_scaled[1:nrow(train1),]
+test_final <- all_encoded_scaled[(nrow(train1)+1):nrow(all_encoded_scaled),]
+```
+\
+### Logistic Regression and cross-validation with LASSO
+I will start by checking that both data sets have the same amount of columns
+```{r}
+all.equal(ncol(train_final),ncol(test_final))
+```
+\
+I will perform cross-validation with LASSO feature selection to find the optimal values for lambda. The log(lambda) plot shows that the model with lambda.1se has the fewest number of features (42) and has the highest submission score of 0.70066 AUC
+```{r}
+set.seed(123)
+
+#cross-validation
+cv <- cv.glmnet(x = as.matrix(train_final), y = DelayIndTrain, family = "binomial")
+
+#lambda values plot
+plot(cv)
+```
+\
+Now I will use lambda.1se to build a model and make predictions. From the plot we can see that the coefficients are shrinking to 0 as log(lambda) grows larger, thus performing variable selection. The submission score of the model is 0.70066 AUC!
+```{r}
+#make a model with lambda.1se
+model <- glmnet(x = as.matrix(train_final), y = DelayIndTrain, family = "binomial", lambda = cv$lambda.1se)
+
+#coefficients going to 0 as lambda becomes large
+modelplot <- glmnet(x = as.matrix(train_final), y = DelayIndTrain, family = "binomial")
+plot(modelplot, xvar="lambda")
+
+#making predictions and writing it in a csv file for submission
+delay_preds <- as.vector(predict(model, newx = as.matrix(test_final), type = "response"))
+scaled_df <- data.frame(ID = rep(1:12376), Delay.Indicator = delay_preds) 
+write.csv(scaled_df, file = "preds_scaledtrafficlog.csv", row.names=FALSE) 
+```
+\
+There are 13 features that were removed by LASSO from the 55 original features. This leaves the model with 42 features which means the above plot cross-validation plot is correct
+```{r}
+which(coef(cv)[,1]==0)
+```
+
+Here is a plot of the 25 most important features from the logistic regression model. Scheduled departure is by far the most important feature, followed by vessel name, and the new cyclical feature (hour.y), and month
+```{r}
+importance = varImp(model, lambda=cv$lambda.1se) %>% mutate(names=row.names(.)) %>%
+  arrange(-Overall)
+
+ggplot(importance[1:25,], aes(x=reorder(names, Overall), y=Overall, fill=names)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  ylab("Importance") +
+  xlab("Feature") +
+  ggtitle("Feature Importance in Logistic Regression model") +
+  theme(legend.position = "none")
+```
+\
+### XGBoost and parameter testing
+I was reading about other techniques and decided to try XGBoost. I read that the model should have high acccuracy, however it isn't as easily interpretable as techniques like logistic regression. There are many parameters so I decided to test a few. I would like to study more about different methods so I can add them to my data analysis "toolkit". In the plots below I plotted the AUC versus the number of interations for different values of parameters (min_child_weight, colsample_bytree, eta, and max_depth) to see which will create a better model
+```{r}
+#making special matrices for xgboost
+trainxg <- xgb.DMatrix(data = as.matrix(train_final), label= as.matrix(DelayIndTrain))
+testxg <- xgb.DMatrix(data = as.matrix(test_final))
+```
+\
+min_child-weight is the minimum weight required to create a new node in the tree. The larger it is, the more conservative the model will be and less prone to overfitting. However if it is too large, the model could be under-fitting and if it is too small, it will allow more complex trees to be created and overfit. I tried the values 0.8, 1, 2, and 3 shows that the curves are similar but 0.8 gives us a submission score of 0.71340 while using the other default parameters and 200 iterations
+```{r}
+nrounds = 200
+mcw = c(0.8, 1, 2, 3)
+conv_cs = matrix(NA,nrounds,length(mcw))
+pred_cs = matrix(NA,nrow(test_final), length(mcw))
+colnames(conv_cs) = colnames(pred_cs) = mcw
+
+for(i in 1:length(mcw)){
+  xgb=xgboost(data = trainxg,
+                  nrounds = nrounds,
+                  objective = "binary:logistic",
+                  max.depth = 3,
+                  early_stopping_rounds = 10,
+                  min_child_weight = mcw[i],
+                  eval_metric = "auc",
+                  verbose = F)
+  conv_cs[,i] = xgb$evaluation_log$train_auc
+  pred_cs[,i] = predict(xgb, testxg)
+}
+conv_cs = data.frame(iteration=1:nrounds, conv_cs)
+conv_cs2 = melt(conv_cs, id.vars = "iteration") %>% dplyr::rename(min_child_weight = variable)
+
+ggplot(data = conv_cs2) + 
+  geom_line(aes(x = iteration, y = value, color = min_child_weight)) +
+  ggtitle("AUC for different values of min_child_weight") +
+  ylab("train_AUC")
+```
+\
+eta is the learning rate of the model or the step size shrinkage with a default value of 0.3. Usually, a lower eta will make a model that is less prone to overfitting, however it will take more iterations thus more time to computer, and sometimes for marginal improvements. I will test the values 0.01, 0.1, 0.2, and 0.3. The default value has the highest AUC curve and the highest submission score of 0.71340
+```{r}
+eta = c(0.3, 0.2, 0.1, 0.01)
+eta_df = matrix(NA,nrounds,length(eta))
+pred_eta = matrix(NA,nrow(test_final), length(eta))
+colnames(eta_df) = colnames(pred_eta) = eta
+for(i in 1:length(eta)){
+  xgb=xgboost(data = trainxg,
+                  nrounds = nrounds,
+                  objective = "binary:logistic",
+                  max.depth = 3,
+                  early_stopping_rounds = 10,
+                  min_child_weight = 0.8,
+                  eta = eta[i],
+                  eval_metric = "auc",
+                  verbose = F)
+  eta_df[,i] = xgb$evaluation_log$train_auc
+  pred_eta[,i] = predict(xgb, testxg)
+}
+eta_df = data.frame(iteration=1:nrounds, eta_df)
+eta2 = melt(eta_df, id.vars = "iteration") %>% dplyr::rename(eta = variable)
+
+ggplot(data = eta2) + 
+  geom_line(aes(x = iteration, y = value, color = eta)) +
+  ggtitle("AUC for different values of eta") +
+  ylab("train_AUC")
+```
+\
+#colsample_bytree corresponds to the fraction of features to use. By default it is set to 1 meaning that we will use all features. I will test the values 1/3, 2/3, 3/4, and 1. The curves are similar with 1/3 as the lowest curve. The default value of 1 has a better submission score of 0.71340
+```{r}
+cbt = round(c(1/3, 2/3, 3/4, 1),3)
+cbt_df = matrix(NA,nrounds,length(cbt))
+pred_cbt = matrix(NA,nrow(test_final), length(cbt))
+colnames(cbt_df) = colnames(pred_cbt) = cbt
+for(i in 1:length(cbt)){
+  xgb=xgboost(data = trainxg,
+                  nrounds = nrounds,
+                  objective = "binary:logistic",
+                  max.depth = 3,
+                  early_stopping_rounds = 10,
+                  min_child_weight = 0.8,
+                  eta = 0.3,
+                  colsample_bytree = cbt[i],
+                  eval_metric = "auc",
+                  verbose = F)
+  cbt_df[,i] = xgb$evaluation_log$train_auc
+  pred_cbt[,i] = predict(xgb, testxg)
+}
+cbt_df = data.frame(iteration=1:nrounds, cbt_df)
+cbt2 = melt(cbt_df, id.vars = "iteration") %>% dplyr::rename(colsample_bytree = variable)
+ggplot(data = cbt2) + geom_line(aes(x = iteration, y = value, color = colsample_bytree)) + 
+  ggtitle("AUC for different values of colsample_bytree") +
+  ylab("train_AUC")
+```
+ \
+Max_depth is the maximum depth of a tree. Increasing this value will make the model more complex and more likely to overfit. The default value of max_depth is 6, however I tried values from 2 to 5. Althought 5 gives us a model with the highest AUC curve, the subsmission score is 0.69227. A model with a max_depth of 3 has a score of 0.71340 along with 0.3 eta, 1 colsamplebytree, and 0.8 min child weight as tested above
+```{r}
+dep = c(2, 3, 4, 5)
+dep_df = matrix(NA,nrounds,length(dep))
+pred_dep = matrix(NA,nrow(test_final), length(dep))
+colnames(dep_df) = colnames(pred_dep) = dep
+for(i in 1:length(dep)){
+  xgb=xgboost(data = trainxg,
+                  nrounds = nrounds,
+                  objective = "binary:logistic",
+                  early_stopping_rounds = 10,
+                  min_child_weight = 0.8,
+                  max_depth = dep[i],
+                  eval_metric = "auc",
+                  verbose = F)
+  dep_df[,i] = xgb$evaluation_log$train_auc
+  pred_dep[,i] = predict(xgb, testxg)
+}
+dep_df = data.frame(iteration=1:nrounds, dep_df)
+dep2 = melt(dep_df, id.vars = "iteration") %>% dplyr::rename(dep = variable)
+
+ggplot(data = dep2) + 
+  geom_line(aes(x = iteration, y = value, color = dep)) +
+  ggtitle("AUC for different values of max_depth") +
+  ylab("train_AUC")
+```
+\
+After consdering the parameters above, I will train a model with 200 iterations, a max_depth of 3, an eta of 0.3, a min_child_weight of 0.8, and colsample_bytree of 1. The curve increases quickly in the first 20 iterations and slows down dramatically
+```{r}
+modelxg <- xgboost(data = trainxg,
+                  nround = 200,
+                  objective = "binary:logistic",
+                  max_depth = 3,
+                  early_stopping_rounds = 10,
+                  min_child_weight = .8,
+                  eval_metric = "auc",
+                  verbose=F
+                  )
+ggplot(modelxg$evaluation_log, aes(x  =modelxg$evaluation_log$iter, y = modelxg$evaluation_log$train_auc)) +
+  geom_line(colour="skyblue") +
+  ggtitle("AUC curve for 200 iterations of XGBoost model") +
+  ylab("AUC") +
+  xlab("Iterations")
+```
+\
+I made predictions using the XGBoost model and the result is a submission score of 0.71340 AUC which is better than the logistic regression model of 0.70066 AUC. The feature importance plot displays the top 25 most important features and also shows that Scheduled.Departure is by far the most significant feature (3 times day of month!)
+```{r}
+predxg <- predict(modelxg, testxg) # predictions 
+
+xgdf<- data.frame(ID = rep(1:12376), Delay.Indicator = predxg)
+ 
+write.csv(xgdf, file = "predsxgboostfinal.csv", row.names=FALSE)
+
+#top 25 most important features, can change numbers as u wish
+xgbimportance <- xgb.importance(model=modelxg, colnames(train_final))
+ggplot(xgbimportance[1:25,], aes(x=reorder(Feature, Gain), y=Gain, fill=Feature)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  ylab("Importance") +
+  xlab("Feature") +
+  ggtitle("Feature Importance in XGBoost model") +
+  theme(legend.position = "none")
+```
+\
+In this chunk, I set up a gridsearch and a cross-validation of more combination of parameters. It took a long time to run and when it finished, the results were in 0s and 1s, but I wanted probabilities. Because of the time limit of the competition and also school work of the courses I'm currently taking, I didn't spend more time trying to figure this out. However in the future, I will definitely come back to this and see if I can improve my model and score.
+```{r, eval=FALSE}
+# set up the cross-validated hyper-parameter search
+xgb_grid_1 = expand.grid(
+nrounds = 200, 
+eta = c(0.3,0.1,0.2),
+max_depth = c(3, 4),
+gamma = 0,
+colsample_bytree = c(0.6,0.8,1), 
+min_child_weight = 1, 
+subsample = c(0.5,0.75,1)
+)
+# pack the training control parameters
+xgb_trcontrol_1 = trainControl(
+method = "cv",
+number = 3,
+verboseIter = TRUE,
+returnData = FALSE,
+returnResamp = "all",                                                        # save losses across all models
+classProbs = TRUE,                                                           # set to TRUE for AUC to be computed
+summaryFunction = twoClassSummary,
+allowParallel = TRUE
+)
+ 
+# train the model for each parameter combination in the grid,
+#   using CV to evaluate
+xgb_train_1 = train(
+x = train_final,
+y = make.names(DelayIndTrain),
+trControl = xgb_trcontrol_1,
+tuneGrid = xgb_grid_1,
+method = "xgbTree"
+)
+
+predxgcv <- predict(xgb_train_1, test_final) 
+levels(predxgcv)[1] <- 0
+levels(predxgcv)[2] <- 1
+xgdfcv<- data.frame(ID = rep(1:12376), Delay.Indicator = predxgcv) 
+write.csv(xgdfcv, file = "xgboostcv.csv", row.names=FALSE) 
+
+# scatter plot of the AUC against max_depth and eta
+ggplot(xgb_train_1$results, aes(x = as.factor(eta), y = max_depth, size = ROC, color = ROC)) +
+geom_point() +
+theme_bw() +
+scale_size_continuous(guide = "none")
+```
+
+### Conclusion
+I enjoyed this competition because it pushed me to learn many things on my own. It was a lot of trial and error, however it is worth it because I gained a lot of knowledge. I want to investigate cross-validation for XGBoost in the future and also parameter tuning, as well as try out other machine learning techniques. In the end, I was placed 24th (on the private leaderboard) with a score of 69.89% AUC
