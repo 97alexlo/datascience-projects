@@ -1,4 +1,4 @@
-# Data science Portfolio
+# Data Science Portfolio
 
 Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU. This is where I will be uploading my academic and personal projects. Thanks for spending the time to visit my github
 
