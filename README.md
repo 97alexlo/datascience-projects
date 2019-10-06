@@ -16,7 +16,7 @@ In this project, I collaborated with two classmates to clean and analyze a [data
 
 
 ### Analysis of Marvel Universe Cinematic films from 2008 - 2019
-In this project, I scraped and analyzed data from Wikipedia's webpage of MCU films
+In this project, I scraped and analyzed data from [Wikipedia's webpage](https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films) of MCU films. I created a variety visualizations and to find trends in the data
 ### [Report](https://rpubs.com/alexlo97/499619)
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
