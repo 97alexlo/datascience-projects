@@ -1,7 +1,7 @@
 # Data Science Portfolio
 
 Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU. This is a place for me to share my personal and academic projects. Thanks for visiting!
-#### ****Note**** After opening a report, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode
+#### **[Note]** After opening a report, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode
 
 ## R
 ### National Case Study Competition: BC Ferries delay prediction
