@@ -7,7 +7,7 @@ Hi, my name is Alexander and I am currently a 4th year student studying statisti
 
 ## R
 ### National Case Study Competition: BC Ferries delay prediction
-This was the first time I participated in a national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It was hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. This contest is open to all graduate and undergraduate students across Canada. In this project, I merged and transformed data sets and created models with logistic regression and XGBoost. I was placed 24th and I really enjoyed this competition because it pushed me to learn a lot on my own.
+This was the first time I participated in a national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I performed data tranformations, feature extraction/engineering, and modelling with logistic regression and XGBoost. I was placed 24th on the private leaderboard and really enjoyed this competition because it pushed me to learn a lot on my own.
 ### [Report](http://rpubs.com/alexlo97/536052)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/ferry%20delays%20case%20study%20competition/scaled_ferries.Rmd)
 
