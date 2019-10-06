@@ -2,10 +2,8 @@
 
 Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU. This is a place for me to share my personal and academic projects. Thanks for visiting!
 \
-[[params.social]]
-    icon = "linkedin"
-    icon_pack = "fa"
-    link = "//linkedin.com/in/alexander-lo-a2119317b"
+[LinkedIn](linkedin.com/in/alexander-lo-a2119317b)
+\
 #### [Note] After opening a report, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode
 <img src="https://github.com/alexlo97/Portfolio/blob/master/Screen%20Shot%202019-10-06%20at%201.55.58%20AM.png" height="100" width="200">
 
