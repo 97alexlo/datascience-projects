@@ -3,6 +3,10 @@
 Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU. This is where I will be uploading my academic and personal projects. Thanks for spending the time to visit my github
 
 ## R
+### National Case Study Competition: BC Ferries delay prediction
+This was the first time I participated in a national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It was hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada.
+#### [Report](http://rpubs.com/alexlo97/536052)
+#### [Code]
 ### Predicting House Sales in King Country
 In this project, I collaborated with two classmates to clean and analyze a [dataset](https://www.kaggle.com/harlfoxem/housesalesprediction) from Kaggle to predict house sales. We created a multiple linear regression model and compared the results using LASSO, Ridge, Stepwise, Forwards, and Backwards feature selection techniques. Our findings were summarised and presented in an executive report and powerPoint presentation to a class of 70 students. 
 ### [PDF Report](https://github.com/alexlo97/Portfolio/blob/master/Housing%20Prices%20Prediction/Stat_350_Project_Report-2.pdf)
