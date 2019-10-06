@@ -23,7 +23,7 @@ In this project, I scraped and analyzed data from [Wikipedia's webpage of MCU fi
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
 ### Twitter (and Sentiment) Analysis of Donald Trump’s tweets
-In this project, I collected data from Donald Trump's twitter with an API. Using the data, I performed text preprocessing and exploratory analysis to draw insights on his tweeting behaviour
+In this project, I collected data from [Donald Trump's twitter](https://twitter.com/realDonaldTrump?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor) with an API. Using the data, I performed text preprocessing and exploratory analysis to draw insights on his tweeting behaviour
 ### [Report](http://rpubs.com/alexlo97/512292)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Twitter%20Analysis/Twitter%20Analysis%20of%20DT.Rmd)
 
