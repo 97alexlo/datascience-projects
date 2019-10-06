@@ -16,7 +16,7 @@ In this project, I collaborated with two classmates to clean and analyze a [data
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Housing%20Prices%20Prediction/stat350_Project_HouseSalesPrice_v7-2.rmd)
 
 ### Analysis of Marvel Universe Cinematic films from 2008 - 2019
-In this project, I scraped and analyzed data from [Wikipedia's webpage of MCU films](https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films. I created a variety visualizations and to find trends in the data.
+In this project, I scraped and analyzed data from [Wikipedia's webpage of MCU films](https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films). I created a variety visualizations and to find trends in the data.
 ### [Report](https://rpubs.com/alexlo97/499619)
 ### [Code](https://github.com/alexlo97/Profolio/blob/master/Analysis%20of%20MCU%20films/Analysis_MCU.Rmd)
 
