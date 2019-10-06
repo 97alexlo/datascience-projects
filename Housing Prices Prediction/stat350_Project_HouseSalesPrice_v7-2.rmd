@@ -1,0 +1,466 @@
+---
+title: |
+  | \vspace{5cm} \textbf{\Huge{STAT 350 Project}}
+subtitle: |
+  | \huge{Housing Prices in King County}
+author:
+- "Vasena Jayamanna - vjayaman"
+- "Alexander Lo - ala148"
+- "Samantha Yu - sya111"
+output:
+  pdf_document:
+    number_sections: true
+linkcolor: blue
+---
+
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.pos = 'h')
+library(MASS)
+library(stats4)
+library(magrittr)
+library(car)
+library(corrplot)
+library(e1071)
+library(olsrr)
+library(glmnet)
+library(plyr)
+```
+
+# Introduction
+We are predicting the house price based on a variety of house features:
+
+```{r, echo = FALSE, results = "show"}
+df_description <- data.frame(
+  Description = c("an identification variable for a house, we don't include this in our analysis", 
+                 "the date the house was sold", 
+                 "the value we want to predict, based on most of the other features", 
+                 "number of bedrooms in a given house", "average number of bathrooms per bedroom", 
+                 "square footage of the house", "square footage of the lot", 
+                 "number of floors in the house", 
+                 "binary value referring to whether or not the house has a waterfront view", 
+                 "number of times the house has been viewed", 
+                 "how good is the overall condition of the house", 
+                 "a grade given to the house based on the King County grading system", 
+                 "square footage of the house apart from the basement", 
+                 "square footage of the basement alone", "the year the house was built", 
+                 "the year the house was renovated", 
+                 "the zip or postal code, we don't include this in our analysis", 
+                 "the latitude coordinate", "the longitude coordinate", 
+                 "the area of the living room as of 2015", 
+                 "the lot area as of 2015")) %>% 
+  set_rownames(., c("id", "date", "price", "bedrooms", "bathrooms", "sqft_living", 
+                        "sqft_lot", "floors", "waterfront", "view", "condition", "grade", 
+                        "sqft_above", "sqft_basement", "yr_built", "yr_renovated", 
+                        "zipcode", "lat", "long", "sqft_living15", "sqft_lot15"))
+knitr::kable(df_description)
+```
+
+```{r, echo=FALSE}
+df <- read.csv("kc_house_data.csv")
+```
+
+We needed to split up the date that the houses were sold, into three features of year_sold, month_sold, and day_sold. 
+```{r}
+years_sold <- laply(df$date, function(r) substring(r, 1, 4) %>% as.integer)
+months_sold <- laply(df$date, function(r) substring(r, 5, 6) %>% as.integer)
+days_sold <- laply(df$date, function(r) substring(r, 7, 8) %>% as.integer)
+df_clean <- data.frame(df[,-c(1,2,17)], year_sold = years_sold, 
+                       month_sold = months_sold, day_sold = days_sold)
+```
+
+We first plot the price to all of the regressors except for the regressors which are strings (i.e. ID, Zip Code). Please see the [summary of this normal model](#lm_original).
+```{r lm_original, include=FALSE}
+lm_original <- lm(price ~ ., data=df_clean)
+summary(lm_original)
+```
+
+Looking at a summary of the full linear model, with all regressors included, we noted a row of NAs for sqft_basement. This indicated multicollinearity, as supported by the correlation plot (FIGURE __).
+We used the alias() function to check for linear dependence, and found that sqft_above and sqft_living were highly correlated with sqft_basement. 
+We tried different configurations of removing each of these three regressors from the model, and found the fewest large variance inflation factors if we removed sqft_basement from the model.
+
+## Check VIFS and the correlation plot
+```{r, echo=FALSE}
+lm_no_basement <- lm(price ~ . - sqft_basement, data=df_clean)
+vif(lm_no_basement)
+corrplot(cor(df_clean), type="upper", tl.col="black", tl.srt=45)
+
+```
+
+```{r lm_no_basement, include=FALSE}
+summary(lm_no_basement)
+```
+Please see the [summary of this model without sqft_basement](#lm_no_basement)
+
+However, we still had VIFs greater than 5 for sqft_living and sqft_above, although the row of NAs in the summary had been dealt with. 
+
+## Model Adequacy Checking
+```{r, echo=FALSE}
+summary_table <- summary(lm_no_basement)
+
+OLS_Residuals = lm_no_basement$residuals
+MSRes = (summary_table$sigma)^2
+Standardized_Residuals = OLS_Residuals/sqrt(MSRes)
+```
+
+### Normal Probability Plot of the Residuals
+```{r, echo=FALSE, fig.height=3.5}
+probplot(Standardized_Residuals, qnorm, xlab='Standardized Residuals', ylab='Percent')
+```
+
+The residual plot appears to have a light-tailed distribution.
+
+### Residuals vs. Time Plot
+```{r, echo=FALSE, fig.height=3.5}
+old.par <- par(mfrow=c(1, 2))
+plot(df_clean$year, Standardized_Residuals,
+     main="Residuals vs. Year",
+     xlab="Year", ylab="Standardized Residuals", xaxt='n')
+axis(1, at=2014:2015)
+abline(h=0)
+
+plot(df_clean$month, Standardized_Residuals,
+     main="Residuals vs. Month",
+     xlab="Month", ylab="Standardized Residuals", xaxt='n')
+axis(1, at=1:12, labels=c("Jan.", "Feb.", "March", "April",
+                          "May", "June", "July", "Aug.",
+                          "Sept.", "Oct.", "Nov.", "Dec."))
+abline(h=0)
+par(old.par)
+```
+The residuals do not appear to vary greatly over time.
+
+### Residuals vs. Predicted Response Plot
+```{r, echo=FALSE, fig.height=3.5}
+png(filename = "Images/res_vs_pred1.png")
+plot(lm_no_basement$fitted.values, Standardized_Residuals,
+     main="Standardized Residuals vs. Predicted Response",
+     xlab="Predicted Response", ylab="Standardized Residuals")
+abline(h=0)
+dev.off()
+```
+
+$\sigma^2 \propto E(y)$ so we will use the transformation: $y' = log(y)$
+
+## Variance Stabilization
+```{r}
+lm_log = lm(log(price) ~ . - sqft_basement, data=df_clean)
+lm_log_summary = summary(lm_log)
+lm_log_summary$adj.r.squared
+```
+```{r lm_log, include=FALSE}
+lm_log_summary
+```
+After transforming the response, we improve the $R^2_{Adj}$ from 0.6967 to 0.7698 (see the [summary of the log model](#lm_log))
+
+## Normal Probability Plot of the Residuals
+```{r, echo=FALSE, fig.height=3.5}
+OLS_Residuals = lm_log$residuals
+MSRes = (lm_log_summary$sigma)^2
+Standardized_Residuals = OLS_Residuals/sqrt(MSRes)
+```
+
+```{r, echo=FALSE, fig.height=3.5}
+probplot(Standardized_Residuals, qnorm, xlab='Standardized Residuals', ylab='Percent')
+```
+
+### Residuals vs. Predicted Response Plot
+```{r, echo=FALSE, fig.height=3.5}
+plot(lm_log$fitted.values, Standardized_Residuals,
+     main="Standardized Residuals vs. Predicted Response",
+     xlab="Predicted Response", ylab="Standardized Residuals")
+abline(h=0)
+```
+
+\pagebreak
+
+# Analysis Methods
+## Variable Selection
+```{r, echo=FALSE}
+r_model <- lm(log(price) ~ 1, data=df_clean)
+f_model <- lm(log(price) ~ ., data=df_clean)
+```
+
+```{r, include=FALSE}
+# Forward Selection
+forward_model <- step(r_model, data=df_clean,
+                       scope=list(lower=r_model, upper=f_model), direction="forward")
+
+# Backward Selection
+backward_model <- step(f_model, data=df_clean, direction="backward")
+
+# Stepwise Selection
+stepwise_model <- step(r_model, data=df_clean, scope=list(upper=f_model), direction="both")
+```
+
+Forwards selection, backwards elimination, and stepwise selection produces the exact same model.
+```{r lm_variable_selection, include=FALSE}
+reduced_model <- forward_model
+summary(reduced_model)
+```
+
+```{r}
+vif(reduced_model)
+```
+Note that in this model, the variable sqft_living still has a variance inflation factor greater than 5. We can verify there is no linear dependence with the alias() function.
+```{r}
+alias(reduced_model)
+```
+
+## Ridge Regression
+#### Theory
+The general OLS method in linear regression involves minimizing the residual sum of squares. Ridge regression is a modification of this, where we instead try to minimize the residual sum of squares plus a penalty term, 
+
+  $\sum^n_{i=1} (y_i - \hat{y_i})^2 + \lambda\sum_{j=1}^p\beta_j^2$,
+
+which limits the magnitude of the coefficients, and limits the variance. 
+```{r Figure X.1, echo=FALSE}
+knitr::include_graphics("Images/ridge_regression_theory.png")
+```
+This can be visualized by a figure where the ellipses represent the residual sum of squares, and the circle represents the sum of the squared coefficients, multiplied by some tuning parameter $\lambda$, being less than some value c. The idea is that as $0<\lambda<\infty$, larger $\lambda$ values penalize larger coefficients strictly. $\lambda$ is found using cross validation techniques.
+
+We adjust $\lambda$ so we shrink the coefficients (not including the intercept). Note that $\sum_{j=1}^{p}\beta_j^2$ is the square of the L2 norm of the $\beta$ vector.
+
+### Input preparation
+```{r}
+df_ridge <- df_clean
+x = model.matrix(log(price) ~ ., df_ridge)[,-1] 
+y = log(df_ridge$price)
+
+grid = 10^seq(10,-2,length=100)
+```
+`model.matrix` is the design matrix, and `grid` is a sequence of $\lambda$ values to draw from.
+
+### Training and Test Sets
+We split the housing data into a training set for model fitting, and a test or validation set for estimating the error.
+```{r, echo=FALSE}
+set.seed(222)
+train = sample(1:nrow(x), nrow(x)/2)
+test = (-train)
+y.train = y[train]
+y.test = y[test]
+```
+The `train` variable is a random sample of indices of our x-values, with total length being half the size of x.
+
+### Selecting the best lambda in ridge, via cross-validation
+We then ran 10-fold cross-validation on the training set to find optimal values for $\lambda$.
+```{r}
+set.seed(222)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+plot(cv.out)
+```
+We have a plot of the cross-validation curve in red, with error bars of the standard deviation of the mean-squared error estimates. The dotted lines indicate the $\lambda$ that gives the minimum mean cv error (log($\lambda_{min}$) is a little over 10) and the largest $\lambda$ where the error is within one standard error of the minimum error (log($\lambda_{1se}$) is just over 12). 
+We select $\lambda_{min}$ for prediction, as for ridge regression the main difference between the two is the mean squared error, not the number of variables. Although the MSE difference is marginal, $\lambda_{min}$ still gives a better result.
+
+Minimal $\lambda$:
+```{r}
+(bestlam=cv.out$lambda.min)
+```
+
+### Ridge regression modeling
+```{r}
+# ridge regression model is when alpha = 0
+# in this case providing a sequence of 100 lambda values
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid)
+# predicts fitted values, coefficients, etc.
+#   "ridge.mod" is the fitted glmnet model object,
+#   "s" is the penalty parameter lambda for which we want predictions
+#   "newx" is the matrix of new x-values for which we want predictions
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+```
+
+### Plotting the estimated coefficients vs log $\lambda$
+```{r}
+plot(ridge.mod, xvar = "lambda")
+```
+Note that while the coefficients are shrunk "towards" zero as log($\lambda$) increases, the number of variables in the model remains the same, as with ridge regression we can shrink coefficients but not remove them entirely. 
+
+```{r}
+bestlam <- cv.out$lambda.min
+
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid)
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+(mse.ridge = mean((ridge.pred-y.test)^2))
+```
+
+
+```{r}
+mse.ridge = mean((ridge.pred-y.test)^2)
+mse.ridge
+
+out=glmnet(x,y,alpha=0)
+coeffs <- predict(out,type="coefficients",s=bestlam)[,1] %>% t() %>% as.data.frame()
+coeffs
+```
+We then used glmnet to create the fitted glmnet model object, and used $\lambda_{min}$ with the test set and the predicted coefficients to calculate the mean squared errors on the test set. We then refit the ridge regression model using the full data set.
+
+```{r}
+y_predict <- predict(out, type = "response", s = bestlam, newx = x)
+sst <- sum((y - mean(y))^2)
+sse <- sum((y_predict - y)^2)
+rsq <- 1 - sse / sst
+rsq_adj <- 1 - ((1-rsq)*(nrow(x)-1))/(nrow(x) - ncol(x) - 1)
+rsq_adj
+```
+We log-transformed the response variable as we developed the ridge regression model, and our result was an adjusted R-squared value of 0.7680.
+
+```{r}
+# bedrooms <- df_ridge$bedrooms
+# bathrooms <- df_ridge$bedrooms
+# sqft_living <- df_ridge$sqft_living
+# sqft_lot <- df_ridge$sqft_lot
+# floors <- df_ridge$floors
+# waterfront <- df_ridge$waterfront
+# view <- df_ridge$view
+# condition <- df_ridge$condition
+# grade <- df_ridge$grade
+# sqft_above <- df_ridge$sqft_above
+# sqft_basement <- df_ridge$sqft_basement
+# yr_built <- df_ridge$yr_built
+# yr_renovated <- df_ridge$yr_renovated
+# lat <- df_ridge$lat
+# long <- df_ridge$long
+# sqft_living15 <- df_ridge$sqft_living15
+# sqft_lot15 <- df_ridge$sqft_lot15
+# year_sold <- df_ridge$year_sold
+# month_sold <- df_ridge$month_sold
+# day_sold <- df_ridge$day_sold
+# price = 153.5478 - 0.007386*bedrooms + 0.06525*bathrooms + 7.7068e-5 * sqft_living + 3.9985e-07*sqft_lot + 0.06661 * floors + 0.3570 * waterfront + 0.05787 * view + 0.06689 * condition + 0.1390 * grade + 6.9248e-05 * sqft_above + 7.9394e-05 * sqft_basement - 0.002698 * yr_built + 4.5048e-05 * yr_renovated + 1.2882 * lat - 0.08435 * long + 0.0001087 * sqft_living15 - 1.8322e-07 * sqft_lot15 + 0.04879 * year_sold + 0.0006612 * month_sold - 0.0005026 * day_sold
+```
+
+
+## LASSO
+```{r}
+x = (model.matrix(log(price) ~., df_clean)[,-1])
+y = log(df_clean$price)
+grid = 10^seq(10,-2,length=100) #<--I dont understand what this means and why                                   it is used in row 237 & 247
+
+# split the data into training and test set
+set.seed(1) #random number
+train=sample(1:nrow(x), nrow(x)/2)
+test=(-train)
+y.train = y[train]
+y.test = y[test]
+x.train = x[train]
+x.test = x[test]
+#alpha = 0 is ridge, alpha = 1 is lasso
+cv.lasso=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.lasso)
+```
+
+```{r}
+#fit model lasso
+lasso.model=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.model, xvar = "lambda")
+```
+
+### With lambda_min
+```{r}
+min_lambda = cv.lasso$lambda.min
+
+#prediction of y
+lasso.prediction=predict(lasso.model,s=min_lambda,newx=x[test,])
+
+#MSE = mean squared of sum of squared difference between y values and true y values
+mse.lasso_min = mean((lasso.prediction-y.test)^2)
+
+# refit LASSO regression using the full data
+full.refit=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coeff=predict(full.refit,type="coefficients",s=min_lambda)[1:21,]
+
+#coefficients that became 0
+lasso.coeff
+
+#all non zero coefficients
+lasso.coeff[lasso.coeff!=0]
+```
+```{r}
+y_predict <- predict(full.refit, type = "response", s = mse.lasso_min, newx = x)
+sst <- sum((y - mean(y))^2)
+sse <- sum((y_predict - y)^2)
+rsq <- 1 - sse / sst
+rsq_adj <- 1 - ((1-rsq)*(nrow(x)-1))/(nrow(x) - ncol(x) - 1)
+rsq_adj
+```
+
+
+### With lambda_1se
+```{r}
+se_lambda = cv.lasso$lambda.1se
+
+#prediction of y
+lasso.prediction=predict(lasso.model,s=se_lambda,newx=x[test,])
+
+#MSE = mean squared of sum of squared difference between y values and true y values
+mse.lasso_se = mean((lasso.prediction-y.test)^2)
+
+# refit LASSO regression using the full data
+full.refit=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coeff=predict(full.refit,type="coefficients",s=se_lambda)[1:21,]
+
+#coefficients that became 0
+lasso.coeff
+
+#all non zero coefficients
+lasso.coeff[lasso.coeff!=0]
+```
+
+```{r}
+y_predict <- predict(full.refit, type = "response", s = mse.lasso_se, newx = x)
+sst <- sum((y - mean(y))^2)
+sse <- sum((y_predict - y)^2)
+rsq <- 1 - sse / sst
+rsq_adj <- 1 - ((1-rsq)*(nrow(x)-1))/(nrow(x) - ncol(x) - 1)
+rsq_adj
+```
+
+### Comparing mean-square errors
+```{r}
+rbind(mse.ridge, mse.lasso_min, mse.lasso_se)
+```
+
+# Conclusion
+Using Tableau, we plotted the housing prices on a [map of King County](#map_king_county).
+
+\pagebreak
+
+# Appendix
+## Summary of the Normal Model {#lm_original}
+```{r ref.label="lm_original", echo=FALSE}
+```
+
+\pagebreak
+
+## Summary of the Model with No sqft_basement {#lm_no_basement}
+```{r ref.label="lm_no_basement", echo=FALSE}
+```
+
+\pagebreak
+
+## Summary of the Log Model {#lm_log}
+```{r ref.label="lm_log", echo=FALSE}
+```
+
+\pagebreak
+
+## Summary of the  Model Produced by Variable Selection {#lm_variable_selection}
+```{r ref.label="lm_variable_selection", echo=FALSE}
+```
+
+\pagebreak
+
+## Maps of Housing Prices in King County {#map_king_county}
+```{r most_expensive_houses, echo=FALSE, out.height = '42.5%'}
+knitr::include_graphics("Images/KingCounty_MostExpensive")
+```
+
+```{r least_expensive_houses, echo=FALSE, out.height = '42.5%'}
+knitr::include_graphics("Images/KingCounty_LeastExpensive")
+```
+
+\pagebreak
+
+## References
+1) "5.1 - Ridge Regression." 1.5 - The Coefficient of Determination, r-Squared | STAT 501, onlinecourses.science.psu.edu/stat857/node/155/. 
