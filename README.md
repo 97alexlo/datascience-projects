@@ -4,7 +4,7 @@ Hi, my name is Alexander and I am currently a 4th year student studying statisti
 \
 [LinkedIn Logo](https://www.linkedin.com/in/alexander-lo-a2119317b/)
 #### [Note] After opening a report, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode
-![alt text](https://github.com/alexlo97/Portfolio/blob/master/Screen%20Shot%202019-10-06%20at%201.55.58%20AM.png){:height="24px" width="48px"}
+![alt text]<img src="https://github.com/alexlo97/Portfolio/blob/master/Screen%20Shot%202019-10-06%20at%201.55.58%20AM.png" height="24" width="48">
 
 ## R
 ### National Case Study Competition: BC Ferries delay prediction
