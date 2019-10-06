@@ -1,13 +1,13 @@
 # Data Science Portfolio
 
 Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU. This is a place for me to share my personal and academic projects. Thanks for visiting!
-#### [Note] After opening a report, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode
+#### **Note** After opening a report, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode
 
 ## R
 ### National Case Study Competition: BC Ferries delay prediction
 This was the first time I participated in a national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It was hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. This contest is open to all graduate and undergraduate students across Canada. In this project, I merged and transformed data sets and create models with logistic regression and XGBoost. I was placed 24th and I really enjoyed this competition because it pushed me to learn a lot on my own.
 ### [Report](http://rpubs.com/alexlo97/536052)
-### [Code](
+### [Code](https://github.com/alexlo97/Portfolio/blob/master/BC%20Ferries%20Case%20Study%20Competition/scaled_ferries.Rmd)
 ### Predicting House Sales in King Country
 In this project, I collaborated with two classmates to clean and analyze a [dataset from Kaggle](https://www.kaggle.com/harlfoxem/housesalesprediction) to predict house sales. We created a multiple linear regression model and compared the results using LASSO, Ridge, Stepwise, Forwards, and Backwards feature selection techniques. Our findings were summarised and presented in an executive report and powerPoint presentation to a class of 70 students. 
 ### [PDF Report](https://github.com/alexlo97/Portfolio/blob/master/Housing%20Prices%20Prediction/Stat_350_Project_Report-2.pdf)
