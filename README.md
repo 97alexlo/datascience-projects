@@ -1,8 +1,9 @@
 # Data Science Portfolio
 
-Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU. This is a place for me to share my personal and academic projects. Thanks for visiting!
+Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU. This is a place for me to share my personal and academic projects. Thanks for visiting
 
 ## R
+#### After opening reports, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode. Thanks!
 ### National Case Study Competition: BC Ferries delay prediction
 This was the first time I participated in a national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It was hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. This contest is open to all graduate and undergraduate students across Canada. In this project, I merged and transformed data sets and create models with logistic regression and XGBoost. I was placed 24th and I really enjoyed this competition because it pushed me to learn a lot on my own.
 ### [Report](http://rpubs.com/alexlo97/536052)
