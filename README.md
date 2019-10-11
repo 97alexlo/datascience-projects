@@ -37,7 +37,9 @@ This is the first [shiny app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/) I cre
 ### [Code](https://github.com/alexlo97/Portfolio/tree/master/Projects/shiny%20app)
 
 ## SQL
-### STAT 240 Introduction to Data Science - SQL Assignment
-### [pdf of report and code](https://www.docdroid.net/FHnnvHF/qa-ass-4.pdf)
+### SQL Assignment - STAT 240 Introduction to Data Science 
+### [PDF of questions](https://www.docdroid.net/LtTFNuW/week5-lab-dave.pdf)
+### [PDF of my solutions](https://www.docdroid.net/FHnnvHF/qa-ass-4.pdf)
+
 
 
