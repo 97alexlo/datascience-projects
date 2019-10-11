@@ -35,3 +35,7 @@ This is a project from STAT 240 where I created webscraper that cleans and colle
 ### My first Shiny app - Climate change in BC from 1979 - 2017
 This is the first [shiny app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/) I created. I customized the layout along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
 ### [Code](https://github.com/alexlo97/Portfolio/tree/master/Projects/shiny%20app)
+
+## SQL
+### STAT 240 Introduction to Data Science - SQL Assignment
+
