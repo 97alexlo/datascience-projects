@@ -38,4 +38,6 @@ This is the first [shiny app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/) I cre
 
 ## SQL
 ### STAT 240 Introduction to Data Science - SQL Assignment
+### [pdf of report and code](https://www.docdroid.net/FHnnvHF/qa-ass-4.pdf)
+
 
