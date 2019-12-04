@@ -7,7 +7,7 @@ Hi, my name is Alexander and I am currently a 4th year student studying statisti
 #### [Note] After opening a report, there is a "Hide Toolbars" button on the bottom right corner of the screen. Clicking it will change the view to fullscreen mode
 
 ## R
-### National Case Study Competition: BC Ferries delay prediction 
+### National Case Study Competition: B.C Ferries delay prediction 
 This was the first time I participated in a national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I cleaned data, performed feature extraction/engineering, and created a model with logistic regression and XGBoost. I placed 24th/65 teams on the private leaderboard and enjoyed this competition because it pushed me to learn a lot on my own.
 ### [RPubs Report](http://rpubs.com/alexlo97/536052)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/ferry%20delays%20case%20study%20competition/scaled_ferries.Rmd)
