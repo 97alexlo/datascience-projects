@@ -6,12 +6,12 @@ Hi, my name is Alexander and I am currently a 4th year student studying statisti
 
 ## R
 ### National Case Study Competition: Predicting Ferry Delays in B.C
-This was my first national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I cleaned data, performed feature extraction/engineering, and created a model with Logistic Regression and XGBoost. I placed 24th/65 teams on the private leaderboard and enjoyed this competition because it pushed me to learn a lot on my own.
+This was my first national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I cleaned and transformed data, performed feature engineering, and implemented Logistic Regression and XGBoost to create predictive model. I placed 24th/65 teams on the private leaderboard and enjoyed this competition because it pushed me to learn a lot on my own.
 ### [RPubs Report](http://rpubs.com/alexlo97/536052)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/ferry%20delays%20case%20study%20competition/scaled_ferries.Rmd)
 
 ### Predicting House Sales in King County 
-In this project, I collaborated with two classmates to clean and analyze a [dataset from Kaggle](https://www.kaggle.com/harlfoxem/housesalesprediction) to predict house sales. We created a multiple linear regression model by comparing different feature selection methods and evaluated diagnostic plots and summaries to improve the predictive accuracy of our model. Our findings were summarised and presented in an executive report and PowerPoint presentation to a class of 70 students. 
+In this project, I collaborated with two classmates to analyze a [dataset from Kaggle](https://www.kaggle.com/harlfoxem/housesalesprediction) to predict house sales. We created a multiple linear regression model by comparing different feature selection methods and evaluated diagnostic plots and summaries to improve the predictive accuracy of our model. Our findings were summarised and presented in an executive report and PowerPoint presentation to a class of 70 students.
 ### [PDF Report](https://www.docdroid.net/5y2QKc4/stat-350-project-report.pdf)
 ### [PowerPoint slides](https://docs.google.com/presentation/d/1d3bMz0YZG9AqL_bYVowkAN12PyJ-OetIZV97-9dq_jw/edit?usp=sharing)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/house%20price%20prediction/stat350_Project_HouseSalesPrice_v7-2.rmd)
