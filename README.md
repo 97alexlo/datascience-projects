@@ -6,7 +6,7 @@ Hi, my name is Alexander and I am currently a 4th year student studying statisti
 
 ## R
 ### National Case Study Competition: Predicting Ferry Delays in B.C
-This was the first time I participated in a national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I cleaned data, performed feature extraction/engineering, and created a model with Logistic Regression and XGBoost. I placed 24th/65 teams on the private leaderboard and enjoyed this competition because it pushed me to learn a lot on my own.
+This was the first national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I cleaned data, performed feature extraction/engineering, and created a model with Logistic Regression and XGBoost. I placed 24th/65 teams on the private leaderboard and enjoyed this competition because it pushed me to learn a lot on my own.
 ### [RPubs Report](http://rpubs.com/alexlo97/536052)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/ferry%20delays%20case%20study%20competition/scaled_ferries.Rmd)
 
@@ -17,7 +17,7 @@ In this project, I collaborated with two classmates to clean and analyze a [data
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/house%20price%20prediction/stat350_Project_HouseSalesPrice_v7-2.rmd)
 
 ### Analysis of Marvel Universe Cinematic films from 2008 - 2019
-In this project, I scraped and analyzed data from [Wikipedia's webpage of MCU films](https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films). I created a variety visualizations and to find trends in the data.
+In this project, I scraped and analyzed data from [Wikipedia's webpage of MCU films](https://en.wikipedia.org/wiki/List_of_Marvel_Cinematic_Universe_films). I created a variety of visualizations to find trends in the data.
 ### [RPubs Report](https://rpubs.com/alexlo97/499619)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/Analysis%20of%20MCU%20films/MCU_Analysis.rmd)
 
@@ -32,12 +32,11 @@ This is a project from STAT 240 (Introduction to Data Science) where I created w
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/SFU%20webscraper/SFU_webscraper.Rmd)
 
 ### My first Shiny app - Climate change in BC from 1979 - 2017
-This is the first [shiny app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/) I created. I customized the layout along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
+This is my first [shiny app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/). I customized the layout along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
 ### [Code](https://github.com/alexlo97/Portfolio/tree/master/Projects/shiny%20app)
 
 ## SQL
 ### SQL Assignment - STAT 240 Introduction to Data Science 
-### [PDF of the assignment](https://www.docdroid.net/LtTFNuW/week5-lab-dave.pdf)
 ### [PDF of my solutions](https://www.docdroid.net/FHnnvHF/qa-ass-4.pdf)
 
 
