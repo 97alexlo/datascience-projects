@@ -11,7 +11,7 @@ This was my first national [Kaggle competition](https://www.kaggle.com/c/canssi-
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/ferry%20delays%20case%20study%20competition/scaled_ferries.Rmd)
 
 ### Predicting House Sales in King County 
-In this project, I collaborated with two classmates to analyze a [dataset from Kaggle](https://www.kaggle.com/harlfoxem/housesalesprediction) to predict house sales. We created a multiple linear regression model by comparing different feature selection methods and evaluated diagnostic plots and summaries to improve the predictive accuracy of our model. Our findings were summarised and presented in an executive report and PowerPoint presentation to a class of 70 students.
+In this project, I collaborated with two classmates to analyze a [dataset from Kaggle](https://www.kaggle.com/harlfoxem/housesalesprediction) to predict house sales. We created a multiple linear regression model by comparing different feature selection methods and evaluated diagnostic plots and summaries. Our findings were summarised and presented in an executive report and PowerPoint presentation to a class of 70 students.
 ### [PDF Report](https://www.docdroid.net/5y2QKc4/stat-350-project-report.pdf)
 ### [PowerPoint slides](https://docs.google.com/presentation/d/1d3bMz0YZG9AqL_bYVowkAN12PyJ-OetIZV97-9dq_jw/edit?usp=sharing)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/house%20price%20prediction/stat350_Project_HouseSalesPrice_v7-2.rmd)
