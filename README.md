@@ -6,7 +6,10 @@ Hi, my name is Alexander and I am currently a 4th year student studying statisti
 
 ## Python
 ### Business Startup Analysis (with Spark) and Prediction
-In this project, my goal was to answer "How hard is it to start a business in different countries?". To answer this question I decided the predict the cost of starting a business in countries around the world, using the [World Development Indicators dataset](https://datacatalog.worldbank.org/dataset/world-development-indicators), which presents "the most current and accurate global development data available, and includes national, regional, and global estimates."
+In this project, my goal was to predict the cost of starting a business in countries around the world. I decided to use the [World Development Indicators dataset](https://datacatalog.worldbank.org/dataset/world-development-indicators), which presents "the most current and accurate global development data available, and includes national, regional, and global estimates."
+### [Part 1: Data Exploration with Spark](https://github.com/alexlo97/Portfolio/blob/master/Projects/BusinessStartupAnalysis/Data%20Exploration.ipynb)
+### [Part 2: Data Transformation, Modelling, and Quality Check with Spark](https://github.com/alexlo97/Portfolio/blob/master/Projects/BusinessStartupAnalysis/Data_Transformation_Modeling_Quality_Check.ipynb)
+### [Part 3: Data Science](https://github.com/alexlo97/Portfolio/blob/master/Projects/BusinessStartupAnalysis/Data%20Science.ipynb)
 
 ## R
 ### National Case Study Competition: Predicting Ferry Delays in B.C
