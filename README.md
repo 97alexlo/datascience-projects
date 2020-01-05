@@ -10,7 +10,7 @@ In this project, my goal was to predict the cost of starting a business in diffe
 ### [1. Data Exploration with Spark](https://github.com/alexlo97/Portfolio/blob/master/Projects/BusinessStartupAnalysis/Data%20Exploration.ipynb)
 ### [2. Data Transformation, Modelling, and Quality Check with Spark](https://github.com/alexlo97/Portfolio/blob/master/Projects/BusinessStartupAnalysis/Data_Transformation_Modeling_Quality_Check.ipynb)
 ### [3. Data Wrangling and Prediction](https://github.com/alexlo97/Portfolio/blob/master/Projects/BusinessStartupAnalysis/Data%20Science.ipynb)
-### [4. Basic Tableau Dashboard](https://public.tableau.com/profile/alex4006#!/vizhome/BusinessStartup/Dashboard1?publish=yes)
+### [4. Tableau Dashboard](https://public.tableau.com/profile/alex4006#!/vizhome/BusinessStartup/Dashboard1?publish=yes)
 
 ## R
 ### National Case Study Competition: Predicting Ferry Delays in B.C
