@@ -43,8 +43,8 @@ This is a project from STAT 240 (Introduction to Data Science) where I created w
 This is my first [shiny app](https://shiny.rcg.sfu.ca/u/ala148/shinyapp/). I customized the layout along with buttons that plots different curves/slopes with the data sets provided by Dr. Campbell
 ### [Code](https://github.com/alexlo97/Portfolio/tree/master/Projects/shiny%20app)
 
-## SQL
-### SQL Assignment - STAT 240 Introduction to Data Science 
+### SQLite Databases - STAT 240 Introduction to Data Science 
+Connected to an SQLite database in R and wrote queries to extract relevant information to perform calculations and create graphs to answer questions
 ### [PDF of my solutions](https://www.docdroid.net/FHnnvHF/qa-ass-4.pdf)
 
 
