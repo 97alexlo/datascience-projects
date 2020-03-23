@@ -14,7 +14,7 @@ In this project, my goal was to predict the cost of starting a business in diffe
 
 ## R
 ### National Case Study Competition: Predicting Ferry Delays in B.C
-This was my first national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I cleaned and transformed data, performed feature engineering, and implemented Logistic Regression and XGBoost to create predictive model. I placed 24th/65 teams on the private leaderboard and enjoyed this competition because it pushed me to learn a lot on my own.
+This was my first national [Kaggle competition](https://www.kaggle.com/c/canssi-ncsc-ferry-delays/overview). It is hosted by CANSSI (Canadian Statistical Sciences Institute) and the goal was to analyze and predict sailing delays between Vancouver and Victoria. The contest is open to all graduate and undergraduate students across Canada. In this project, I cleaned and transformed data, performed feature engineering, and implemented Logistic Regression and XGBoost to create predictive model. I placed 24th/65 teams on the private leaderboard
 ### [RPubs report](http://rpubs.com/alexlo97/536052)
 ### [Code](https://github.com/alexlo97/Portfolio/blob/master/Projects/ferry%20delays%20case%20study%20competition/scaled_ferries.Rmd)
 
