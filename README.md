@@ -1,7 +1,5 @@
 Hi, my name is Alexander and I am currently a 4th year student studying statistics at SFU.  Below are my personal and academic data science projects. Thank you for spending the time to visit
 
-[LinkedIn](https://www.linkedin.com/in/alexander-lo-a2119317b/)
-
 ## Python
 ### Business Startup Analysis with PySpark and Prediction
 In this project, my goal was to predict the cost of starting a business in different countries around the world. I decided to use the [World Development Indicators dataset](https://datacatalog.worldbank.org/dataset/world-development-indicators), which presents "the most current and accurate global development data available, and includes national, regional, and global estimates."
